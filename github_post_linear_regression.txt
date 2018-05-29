@@ -1,6 +1,6 @@
 # my_machine_learning_regression
 # my learning with data science and implementing simple regression model
-# using the basketball player basic information of Name, team, height, weight, Position & age  to implement the linear regression model
+# using the baseball player basic information of Name, team, height, weight, Position & age  to implement the linear regression model
 # independent variables - Age & Height. Dependent variable - Weight
 # open r studio in windows
 # check for the current directory path
