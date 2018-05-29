@@ -1,0 +1,71 @@
+# my_machine_learning_regression
+# my learning with data science and implementing simple regression model
+# using the basketball player basic information of Name, team, height, weight, Position & age  to implement the linear regression model
+# independent variables - Age & Height. Dependent variable - Weight
+# open r studio in windows
+# check for the current directory path
+> getwd()
+# change to the desired directory path
+> setwd(<your directory path>)
+# reading the cas file of basketball data from the set directory
+> original_data <- read.csv("./baseball.csv")
+# Now for weight determination the attributes like Name, team & Position donot have any statistical significance. Hence removing those.
+> original_data$Name <- NULL
+> original_data$Team <- NULL
+> original_data$Position <- NULL
+# so now we are left with height, weight & Age
+# to check is there any null value exist or not
+> sapply(original_data,function(x){sum(is.na(x))})
+# to remove null value from the specified column
+> original_data$Weight[is.na(original_data$Weight)]=mean(original_data$Weight,na.rm=T)
+# now we can draw the simple plot to schek the relationship of Weight against Height and Age
+> plot(Weight ~ Height+Age, data=original_data)
+# this method used to check the correlation between independent variables 
+#can be changed try using method=’circle’
+> o=corrplot(cor(original_data),method='number') 
+# creating the dataset only with independent variables
+input_data <- subset(original_data, select = -c(Weight))
+# now we can use the linear regression method in r to fit the data
+> linear_reg_model <- lm(Weight ~ Height+Age, data=original_data)
+# drawing the regression line 
+abline(linear_reg_model, col="blue")
+# checking the basic statistical values
+summary(linear_reg_model)
+# using coplot function to view the subset of data. 
+# Below statement means here’s a coplot for Weight as a function of Height in the original data set, conditioned by Age.
+> coplot(Weight~Height|Age,panel=panel.smooth,original_data,col="green" )
+# now will be creating a function which will call the predict method using the input data for prediction.
+mypredict <- function(input_data)
+> {
+  pred <- predict(linear_reg_model, input_data, type="response")
+  }
+# to check the detaikls of the outcome
+> print(mypredict(input_data))
+# to deploy the above model for user we need to install few packages. We will be using the AZURE ML for deployment.
+# first need to create an account in AZURE ML site. Require an Microsoft account for the same.
+# post creation will be provided with two key value in settings - wsID and wsAuth
+> install.packages("AzureML")
+> install.packages("devtools")
+# to use these libraries in the script
+> library(AzureML)
+> library(devtools)
+# need to provide below two key values 
+> wsID = "<some value>"
+> wsAuth = "<some value>"
+> wsobj = workspace(wsID, wsAuth)
+# will then call the AZURE provided we service method
+> mywebservice <- publishWebService(
+                                           wsobj,
+                                           fun = mypredict,
+                                           name = "mywebservice",
+                                           inputSchema = input_data
+                                         )
+# can check the details of the same
+> head(mywebservice)
+# lastly need to restart R for implementing the changes.
+> .rs.restartR()
+# thats all!!... need to logged in to the AZURE web page and then check for the webservices to find the above created one. 
+# Now test and run the same by providing the two input Age and Height to get the predicted Weight value against the same.
+# Happy coding..happy R !!!:) 
+
+
